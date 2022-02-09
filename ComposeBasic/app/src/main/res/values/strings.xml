@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ComposeBasic</string>
+    <string name="text">这是一个从 strings.xml 里面来的文本</string>
 </resources>
