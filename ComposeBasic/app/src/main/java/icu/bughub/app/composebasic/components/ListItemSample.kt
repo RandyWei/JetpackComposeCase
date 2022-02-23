@@ -42,6 +42,7 @@ fun ListItemSample() {
                 Text("Secondary Text")
             }, trailing = {
                 Checkbox(checked = listItem.checked, onCheckedChange = {
+
                     list = list.mapIndexed { newIndex, listItem ->
                         val newItem = listItem.copy()
                         if (rawIndex == newIndex) {
