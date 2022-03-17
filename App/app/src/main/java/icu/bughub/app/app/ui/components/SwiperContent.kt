@@ -74,8 +74,11 @@ fun SwiperContent(vm: MainViewModel) {
     }
 }
 
-private fun Int.floorMod(other: Int): Int = when (other) {
+fun Int.floorMod(other: Int): Int = when (other) {
     0 -> this
+    //将虚拟数据按照实际数据总数分为 N 组
+    //当前虚拟下标是在这虚拟数据中的哪一组：虚拟下标floorDiv实际数据总数(虚拟下标/实际数据总数)。向下取整
+    //虚拟下标 - (虚拟下标/实际数据总数) * 实际数据总数
     else -> this - floorDiv(other) * other
 }
 

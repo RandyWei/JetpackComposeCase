@@ -49,6 +49,10 @@ class MainViewModel : ViewModel() {
     var currentTypeIndex by mutableStateOf(0)
         private set
 
+    //是否文章列表
+    var showArticleList by mutableStateOf(true)
+        private set
+
     /**
      * 更新类型下标
      *
@@ -56,6 +60,7 @@ class MainViewModel : ViewModel() {
      */
     fun updateTypeIndex(index: Int) {
         currentTypeIndex = index
+        showArticleList = currentTypeIndex == 0
     }
 
     //轮播图数据
@@ -66,5 +71,10 @@ class MainViewModel : ViewModel() {
         SwiperEntity("https://docs.bughub.icu/compose/assets/banner4.jpg"),
         SwiperEntity("https://docs.bughub.icu/compose/assets/banner5.jpg")
     )
+
+    //通知数据
+    val notifications =
+        listOf("人社部向疫情防控期", "湖北黄冈新冠肺炎患者治愈病例破千连续5治愈病例破千连续5", "安徽单日新增确诊病例首次降至个位数累计")
+
 
 }

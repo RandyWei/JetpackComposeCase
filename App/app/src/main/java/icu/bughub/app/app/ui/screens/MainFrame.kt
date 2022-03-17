@@ -1,6 +1,8 @@
 package icu.bughub.app.app.ui.screens
 
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -30,7 +32,6 @@ fun MainFrame() {
 
     ProvideWindowInsets {
         Scaffold(bottomBar = {
-
             BottomNavigation(
                 backgroundColor = MaterialTheme.colors.surface,
                 modifier = Modifier.navigationBarsPadding(bottom = true)
@@ -56,14 +57,14 @@ fun MainFrame() {
                     )
                 }
             }
-
-
         }
         ) {
-            when (currentNavigationIndex) {
-                0 -> StudyScreen()
-                1 -> TaskScreen()
-                2 -> MineScreen()
+            Box(modifier = Modifier.padding(it)) {
+                when (currentNavigationIndex) {
+                    0 -> StudyScreen()
+                    1 -> TaskScreen()
+                    2 -> MineScreen()
+                }
             }
         }
     }
