@@ -20,6 +20,8 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import icu.bughub.app.app.ui.theme.Blue200
 import icu.bughub.app.app.ui.theme.Blue700
 
+//标题栏高度
+val appBarHeight = 56.dp
 
 /**
  * 统一标题栏
@@ -36,8 +38,7 @@ fun TopAppBar(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
         systemUiController.setStatusBarColor(Color.Transparent)
     }
 
-    //标题栏高度
-    val appBarHeight = 56.dp
+
 
     //转换状态栏高度 px 为 dp
     val statusBarHeightDp = with(LocalDensity.current) {
