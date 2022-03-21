@@ -4,11 +4,13 @@ package icu.bughub.app.app.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -19,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.statusBarsPadding
+import icu.bughub.app.app.ui.components.CircleRing
 import icu.bughub.app.app.ui.components.appBarHeight
 import icu.bughub.app.app.viewmodel.TaskViewModel
 
@@ -30,6 +33,11 @@ fun TaskScreen(taskVM: TaskViewModel = viewModel()) {
     var boxWidthDp: Int
     with(LocalConfiguration.current) {
         boxWidthDp = screenWidthDp / 2
+    }
+
+    //当学年积分改变时重新计算百分比
+    LaunchedEffect(taskVM.pointOfYear) {
+        taskVM.updatePointPercent()
     }
 
     Column(
@@ -78,14 +86,16 @@ fun TaskScreen(taskVM: TaskViewModel = viewModel()) {
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .height(boxWidthDp.dp)
+                        .padding(top = 8.dp)
                 ) {
                     //圆环
+                    CircleRing(boxWidthDp, taskVM)
 
                     //进度数据
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             buildAnnotatedString {
-                                append(taskVM.pointOfYear)
+                                append(taskVM.pointOfYear.toString())
                                 withStyle(SpanStyle(fontSize = 12.sp)) {
                                     append("分")
                                 }
@@ -99,6 +109,67 @@ fun TaskScreen(taskVM: TaskViewModel = viewModel()) {
                             color = Color.White
                         )
                     }
+                }
+            }
+
+            item {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = (-40).dp)
+                ) {
+                    Column() {
+                        Text(
+                            text = "${taskVM.totalPointOfYear}分",
+                            fontSize = 16.sp,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "学年规定积分",
+                            fontSize = 12.sp,
+                            color = Color.White
+                        )
+                    }
+                    Column() {
+                        Text(
+                            text = "${taskVM.totalPointOfYear - taskVM.pointOfYear}分",
+                            fontSize = 16.sp,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "还差",
+                            fontSize = 12.sp,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+
+            //学习明细
+            item {
+                Column(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                        .background(Color.White)
+                        .fillMaxSize()
+                        .padding(top = 8.dp)
+                        .padding(horizontal = 8.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "学习明细",
+                        fontSize = 16.sp,
+                        color = Color(0xFF333333)
+                    )
+                    Text(
+                        text = "最近一周获得积分情况",
+                        fontSize = 14.sp,
+                        color = Color(0xFF999999)
+                    )
+
+                    //积分情况的折线图
+
+
                 }
             }
         }
