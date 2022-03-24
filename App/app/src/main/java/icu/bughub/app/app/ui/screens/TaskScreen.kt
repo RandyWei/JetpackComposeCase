@@ -21,7 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.statusBarsPadding
+import icu.bughub.app.app.ui.components.ChartView
 import icu.bughub.app.app.ui.components.CircleRing
+import icu.bughub.app.app.ui.components.DailyTaskContent
 import icu.bughub.app.app.ui.components.appBarHeight
 import icu.bughub.app.app.viewmodel.TaskViewModel
 
@@ -38,6 +40,7 @@ fun TaskScreen(taskVM: TaskViewModel = viewModel()) {
     //当学年积分改变时重新计算百分比
     LaunchedEffect(taskVM.pointOfYear) {
         taskVM.updatePointPercent()
+        taskVM.updateTips()
     }
 
     Column(
@@ -168,7 +171,38 @@ fun TaskScreen(taskVM: TaskViewModel = viewModel()) {
                     )
 
                     //积分情况的折线图
+                    ChartView(taskVM.pointsOfWeek, modifier = Modifier.padding(vertical = 8.dp))
 
+                    //日期
+                    Row() {
+                        taskVM.weeks.forEach {
+                            Text(
+                                text = it,
+                                fontSize = 12.sp,
+                                color = Color(0xFF999999),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+
+                    //今日任务提醒
+                    Text(
+                        text = taskVM.tips,
+                        color = Color(0xFF149EE7),
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(
+                                Color(0x33149EE7)
+                            )
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                    )
+
+                    //每日任务
+                    DailyTaskContent()
 
                 }
             }

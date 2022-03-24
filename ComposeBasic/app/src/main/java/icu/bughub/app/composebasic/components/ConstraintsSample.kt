@@ -4,6 +4,7 @@ package icu.bughub.app.composebasic.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -75,9 +76,33 @@ fun ConstraintsSample() {
 
 }
 
+@Composable
+fun ConstraintLayoutSample1() {
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .background(Color.Yellow)
+    ) {
+
+        val (button, text) = createRefs()
+
+        Button(onClick = { }, modifier = Modifier.constrainAs(button) {
+            centerTo(parent)
+        }) {
+            Text(text = "Button")
+        }
+
+        Text(text = "Text", modifier = Modifier.constrainAs(text) {
+            top.linkTo(button.bottom, 8.dp)
+            start.linkTo(button.start)
+        })
+    }
+}
+
 @Preview
 @Composable
 fun ConstraintsSamplePreview() {
-    ConstraintsSample()
+    ConstraintLayoutSample1()
 }
 
