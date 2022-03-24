@@ -38,8 +38,6 @@ fun TopAppBar(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
         systemUiController.setStatusBarColor(Color.Transparent)
     }
 
-
-
     //转换状态栏高度 px 为 dp
     val statusBarHeightDp = with(LocalDensity.current) {
         LocalWindowInsets.current.statusBars.top.toDp()

@@ -18,7 +18,9 @@ import icu.bughub.app.app.model.entity.NavigationItem
 
 
 @Composable
-fun MainFrame() {
+fun MainFrame(
+    onNavigateToArticle: () -> Unit = {}
+) {
 
     val navigationItems = listOf(
         NavigationItem(title = "学习", icon = Icons.Filled.Home),
@@ -30,44 +32,43 @@ fun MainFrame() {
         mutableStateOf(0)
     }
 
-    ProvideWindowInsets {
-        Scaffold(bottomBar = {
-            BottomNavigation(
-                backgroundColor = MaterialTheme.colors.surface,
-                modifier = Modifier.navigationBarsPadding(bottom = true)
-            ) {
-                navigationItems.forEachIndexed { index, navigationItem ->
-                    BottomNavigationItem(
-                        selected = currentNavigationIndex == index,
-                        onClick = {
-                            currentNavigationIndex = index
-                        },
-                        //直接考试结果页面，进入查看页面，返回直接回到列表？
-                        icon = {
-                            Icon(
-                                imageVector = navigationItem.icon,
-                                contentDescription = null
-                            )
-                        },
-                        label = {
-                            Text(text = navigationItem.title)
-                        },
-                        selectedContentColor = Color(0xFF149EE7),
-                        unselectedContentColor = Color(0xFF999999)
-                    )
-                }
-            }
-        }
+    Scaffold(bottomBar = {
+        BottomNavigation(
+            backgroundColor = MaterialTheme.colors.surface,
+            modifier = Modifier.navigationBarsPadding(bottom = true)
         ) {
-            Box(modifier = Modifier.padding(it)) {
-                when (currentNavigationIndex) {
-                    0 -> StudyScreen()
-                    1 -> TaskScreen()
-                    2 -> MineScreen()
-                }
+            navigationItems.forEachIndexed { index, navigationItem ->
+                BottomNavigationItem(
+                    selected = currentNavigationIndex == index,
+                    onClick = {
+                        currentNavigationIndex = index
+                    },
+                    //直接考试结果页面，进入查看页面，返回直接回到列表？
+                    icon = {
+                        Icon(
+                            imageVector = navigationItem.icon,
+                            contentDescription = null
+                        )
+                    },
+                    label = {
+                        Text(text = navigationItem.title)
+                    },
+                    selectedContentColor = Color(0xFF149EE7),
+                    unselectedContentColor = Color(0xFF999999)
+                )
             }
         }
     }
+    ) {
+        Box(modifier = Modifier.padding(it)) {
+            when (currentNavigationIndex) {
+                0 -> StudyScreen(onNavigateToArticle = onNavigateToArticle)
+                1 -> TaskScreen()
+                2 -> MineScreen()
+            }
+        }
+    }
+
 
 }
 

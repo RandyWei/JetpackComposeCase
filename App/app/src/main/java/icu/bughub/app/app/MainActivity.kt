@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
+import icu.bughub.app.app.ui.components.NavHostApp
 import icu.bughub.app.app.ui.screens.MainFrame
 import icu.bughub.app.app.ui.theme.AppTheme
 
@@ -46,7 +47,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MainFrame()
+                    NavHostApp()
                 }
             }
         }
