@@ -16,11 +16,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.statusBarsPadding
-
+import icu.bughub.app.app.ui.components.WebView
+import icu.bughub.app.app.ui.components.rememberWebViewState
+import icu.bughub.app.app.viewmodel.ArticleViewModel
 
 @Composable
-fun ArticleDetailScreen(onBack: () -> Unit) {
+fun ArticleDetailScreen(articleViewModel: ArticleViewModel = viewModel(), onBack: () -> Unit) {
+
+    val webViewState = rememberWebViewState(data = articleViewModel.content)
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -57,9 +63,7 @@ fun ArticleDetailScreen(onBack: () -> Unit) {
             .background(MaterialTheme.colors.primary)
             .statusBarsPadding()
     ) {
-        Text(
-            text = "这是文章详情内容"
-        )
+        WebView(webViewState)
     }
 }
 
