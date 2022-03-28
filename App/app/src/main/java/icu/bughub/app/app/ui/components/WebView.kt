@@ -1,18 +1,56 @@
 package icu.bughub.app.app.ui.components
 
 
+import android.graphics.Bitmap
+import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @Composable
 fun WebView(state: WebViewState) {
 
-    AndroidView(factory = { context ->
-        android.webkit.WebView(context)
-    }) { view ->
+    var webView by remember {
+        mutableStateOf<WebView?>(null)
+    }
 
+    //webview 变化或 state变化时重新订阅流数据
+    LaunchedEffect(webView, state) {
+        with(state) {
+            //订阅流
+            webView?.handleEvents()
+        }
+    }
+
+    AndroidView(factory = { context ->
+        WebView(context).apply {
+            webChromeClient = object : WebChromeClient() {
+                override fun onReceivedTitle(view: WebView?, title: String?) {
+                    super.onReceivedTitle(view, title)
+                    state.pageTitle = title
+                }
+            }
+
+            webViewClient = object : WebViewClient() {
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    state.pageTitle = null
+                }
+            }
+
+            with(settings) {
+                javaScriptEnabled = true
+            }
+        }.also { webView = it }
+    }) { view ->
         when (val content = state.content) {
             is WebContent.Url -> {
                 val url = content.url
@@ -40,25 +78,55 @@ sealed class WebContent() {
     data class Data(val data: String, val baseUrl: String? = null) : WebContent()
 }
 
-class WebViewState(webContent: WebContent) {
+class WebViewState(private val coroutineScope: CoroutineScope, webContent: WebContent) {
     //网页内容：url 或者 data(html 内容)
     var content by mutableStateOf(webContent)
 
-    //TODO 遗留问题
+    //TODO 遗留问题：调用范围问题?不能设置为 private ，那应该怎么办？
     var pageTitle: String? by mutableStateOf(null)
+
+    //事件类型
+    private enum class EventType {
+        EVALUATE_JAVASCRIPT //执行 JS 方法
+    }
+
+    //共享流的数据类型
+    private class Event(val type: EventType, val args: String, val callback: ((String) -> Unit)?)
+
+    //共享流
+    private val events: MutableSharedFlow<Event> = MutableSharedFlow()
+
+    suspend fun WebView.handleEvents(): Unit = withContext(Dispatchers.Main) {
+        events.collect { event ->
+            when (event.type) {
+                EventType.EVALUATE_JAVASCRIPT -> evaluateJavascript(event.args, event.callback)
+            }
+        }
+    }
+
+    //执行 js 方法
+    fun evaluateJavascript(script: String, resultCallback: ((String) -> Unit)? = {}) {
+        val event = Event(EventType.EVALUATE_JAVASCRIPT, script, resultCallback)
+        coroutineScope.launch { events.emit(event) } //推送流
+    }
 }
 
 @Composable
-fun rememberWebViewState(url: String) = remember(key1 = url) {
-    WebViewState(WebContent.Url(url))
-}
+fun rememberWebViewState(coroutineScope: CoroutineScope = rememberCoroutineScope(), url: String) =
+    remember(key1 = url) {
+        WebViewState(coroutineScope, WebContent.Url(url))
+    }
 
 @Composable
-fun rememberWebViewState(data: String, baseUrl: String? = null) = remember(
+fun rememberWebViewState(
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    data: String,
+    baseUrl: String? = null
+) = remember(
     key1 = data,
     key2 = baseUrl
 ) {
-    WebViewState(WebContent.Data(data, baseUrl))
+    WebViewState(coroutineScope, WebContent.Data(data, baseUrl))
 }
 
 @Preview
