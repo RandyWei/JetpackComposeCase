@@ -16,9 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.statusBarsPadding
-import icu.bughub.app.app.ui.components.WebView
-import icu.bughub.app.app.ui.components.rememberWebViewState
 import icu.bughub.app.app.viewmodel.ArticleViewModel
+import icu.bughub.app.module.webview.WebView
+import icu.bughub.app.module.webview.rememberWebViewState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)

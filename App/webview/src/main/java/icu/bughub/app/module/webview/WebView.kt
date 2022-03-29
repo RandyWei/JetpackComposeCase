@@ -1,4 +1,4 @@
-package icu.bughub.app.app.ui.components
+package icu.bughub.app.module.webview
 
 
 import android.graphics.Bitmap
@@ -8,11 +8,9 @@ import android.webkit.WebViewClient
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.collect
 
 
 @Composable
@@ -82,8 +80,8 @@ class WebViewState(private val coroutineScope: CoroutineScope, webContent: WebCo
     //网页内容：url 或者 data(html 内容)
     var content by mutableStateOf(webContent)
 
-    //TODO 遗留问题：调用范围问题?不能设置为 private ，那应该怎么办？
     var pageTitle: String? by mutableStateOf(null)
+        internal set
 
     //事件类型
     private enum class EventType {
@@ -96,7 +94,7 @@ class WebViewState(private val coroutineScope: CoroutineScope, webContent: WebCo
     //共享流
     private val events: MutableSharedFlow<Event> = MutableSharedFlow()
 
-    suspend fun WebView.handleEvents(): Unit = withContext(Dispatchers.Main) {
+    internal suspend fun WebView.handleEvents(): Unit = withContext(Dispatchers.Main) {
         events.collect { event ->
             when (event.type) {
                 EventType.EVALUATE_JAVASCRIPT -> evaluateJavascript(event.args, event.callback)
