@@ -34,7 +34,8 @@ fun StudyScreen(
     vm: MainViewModel = viewModel(),
     articleViewModel: ArticleViewModel = viewModel(),
     videoViewModel: VideoViewModel = viewModel(),
-    onNavigateToArticle: () -> Unit = {}
+    onNavigateToArticle: () -> Unit = {},
+    onNavigateToVideo: () -> Unit = {},
 ) {
     Column(modifier = Modifier) {
         //标题栏
@@ -159,7 +160,9 @@ fun StudyScreen(
             } else {
                 //视频列表
                 items(videoViewModel.list) { videoEntity ->
-                    VideoItem(videoEntity)
+                    VideoItem(modifier = Modifier.clickable {
+                        onNavigateToVideo()
+                    }, videoEntity)
                 }
             }
         }

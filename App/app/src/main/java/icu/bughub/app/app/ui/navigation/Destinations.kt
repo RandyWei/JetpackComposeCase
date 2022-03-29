@@ -6,4 +6,6 @@ sealed class Destinations(val route: String) {
 
     //文章详情页
     object ArticleDetail : Destinations("ArticleDetail")
+    //视频详情页
+    object VideoDetail : Destinations("VideoDetail")
 }

@@ -14,6 +14,7 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import icu.bughub.app.app.ui.navigation.Destinations
 import icu.bughub.app.app.ui.screens.ArticleDetailScreen
 import icu.bughub.app.app.ui.screens.MainFrame
+import icu.bughub.app.app.ui.screens.VideoDetailScreen
 
 /**
  * 导航控制器
@@ -47,6 +48,8 @@ fun NavHostApp() {
                 MainFrame(onNavigateToArticle = {
                     Log.i("===", "onNavigateToArticle")
                     navController.navigate(Destinations.ArticleDetail.route)
+                }, onNavigateToVideo = {
+                    navController.navigate(Destinations.VideoDetail.route)
                 })
             }
 
@@ -61,6 +64,21 @@ fun NavHostApp() {
                 },
             ) {
                 ArticleDetailScreen(onBack = {
+                    navController.popBackStack()
+                })
+            }
+
+            //视频详情页
+            composable(
+                Destinations.VideoDetail.route,
+                enterTransition = {
+                    slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
+                },
+                exitTransition = {
+                    slideOutOfContainer(AnimatedContentScope.SlideDirection.Right)
+                },
+            ) {
+                VideoDetailScreen(onBack = {
                     navController.popBackStack()
                 })
             }
