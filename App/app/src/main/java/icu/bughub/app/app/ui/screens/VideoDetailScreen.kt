@@ -19,7 +19,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.statusBarsPadding
 import com.tencent.rtmp.TXVodPlayer
+import icu.bughub.app.app.ui.components.video.VideoPlayer
 import icu.bughub.app.app.ui.components.video.VideoView
+import icu.bughub.app.app.ui.components.video.rememberVodController
 import icu.bughub.app.app.viewmodel.VideoViewModel
 import icu.bughub.app.module.webview.WebView
 import icu.bughub.app.module.webview.rememberWebViewState
@@ -30,11 +32,10 @@ fun VideoDetailScreen(videoViewModel: VideoViewModel = viewModel(), onBack: () -
 
     val webViewState = rememberWebViewState(data = videoViewModel.videoDesc)
 
-    val vodPlayer = TXVodPlayer(LocalContext.current)
+    val vodController = rememberVodController()
 
-    LaunchedEffect(vodPlayer) {
-        //http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4
-        vodPlayer.startPlay("http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4")
+    LaunchedEffect(vodController) {
+        vodController.startPlay(videoViewModel.videoUrl)
     }
 
     Scaffold(
@@ -66,7 +67,7 @@ fun VideoDetailScreen(videoViewModel: VideoViewModel = viewModel(), onBack: () -
         Column(modifier = Modifier.fillMaxSize()) {
             //视频区域
             Box(modifier = Modifier.height(200.dp)) {
-                VideoView(vodPlayer = vodPlayer)
+                VideoPlayer(vodController = vodController)
             }
 
             //想让标题一起滚动，有两个方案

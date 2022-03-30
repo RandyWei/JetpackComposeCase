@@ -60,6 +60,8 @@ class VideoViewModel : ViewModel() {
     )
         private set
 
+    var videoUrl by mutableStateOf("http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4")
+        private set
 
     private var videoTitle by mutableStateOf("习近平@战“疫”一线的这些群体：你们为疫")
 
