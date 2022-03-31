@@ -1,16 +1,18 @@
 package icu.bughub.app.app.ui.screens
 
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NavigateBefore
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,10 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.statusBarsPadding
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.tencent.rtmp.TXVodPlayer
 import icu.bughub.app.app.ui.components.video.VideoPlayer
 import icu.bughub.app.app.ui.components.video.VideoView
 import icu.bughub.app.app.ui.components.video.rememberVodController
+import icu.bughub.app.app.ui.theme.Blue700
 import icu.bughub.app.app.viewmodel.VideoViewModel
 import icu.bughub.app.module.webview.WebView
 import icu.bughub.app.module.webview.rememberWebViewState
@@ -30,43 +34,76 @@ import icu.bughub.app.module.webview.rememberWebViewState
 @Composable
 fun VideoDetailScreen(videoViewModel: VideoViewModel = viewModel(), onBack: () -> Unit) {
 
+    val systemUiController = rememberSystemUiController()
+
     val webViewState = rememberWebViewState(data = videoViewModel.videoDesc)
 
-    val vodController = rememberVodController()
+    val vodController =
+        rememberVodController(
+            videoUrl = videoViewModel.videoUrl,
+            coverUrl = videoViewModel.coverUrl
+        )
+    val configuration = LocalConfiguration.current
 
-    LaunchedEffect(vodController) {
-        vodController.startPlay(videoViewModel.videoUrl)
+    var scaffoldModifier by remember {
+        mutableStateOf(Modifier.alpha(1f))
+    }
+
+    var videoBoxModifier by remember {
+        mutableStateOf(
+            Modifier.aspectRatio(16 / 9f)
+        )
+    }
+    //TODO 横屏后，点击屏幕状态栏即显示出来，而且不会再隐藏，如何处理这个问题？
+    LaunchedEffect(configuration.orientation) {
+        if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            videoBoxModifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16 / 9f)
+            systemUiController.isSystemBarsVisible = true
+
+            scaffoldModifier = Modifier
+                .background(Blue700)
+                .statusBarsPadding()
+
+        } else {
+            videoBoxModifier = Modifier
+                .fillMaxSize()
+            systemUiController.isSystemBarsVisible = false
+
+            scaffoldModifier = Modifier
+        }
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "视频详情",
-                        fontSize = 18.sp
-                    )
-                },
-                navigationIcon = {
-                    Icon(
-                        imageVector = Icons.Default.NavigateBefore,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .clickable {
-                                onBack()
-                            }
-                            .padding(8.dp)
-                    )
-                },
-            )
+            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "视频详情",
+                            fontSize = 18.sp
+                        )
+                    },
+                    navigationIcon = {
+                        Icon(
+                            imageVector = Icons.Default.NavigateBefore,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .clickable {
+                                    onBack()
+                                }
+                                .padding(8.dp)
+                        )
+                    },
+                )
+            }
         },
-        modifier = Modifier
-            .background(MaterialTheme.colors.primary)
-            .statusBarsPadding(),
+        modifier = scaffoldModifier,
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             //视频区域
-            Box(modifier = Modifier.height(200.dp)) {
+            Box(modifier = videoBoxModifier) {
                 VideoPlayer(vodController = vodController)
             }
 

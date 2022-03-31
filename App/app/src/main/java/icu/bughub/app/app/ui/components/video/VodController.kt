@@ -10,7 +10,7 @@ import com.tencent.rtmp.ITXVodPlayListener
 import com.tencent.rtmp.TXLiveConstants
 import com.tencent.rtmp.TXVodPlayer
 
-class VodController(context: Context) {
+class VodController(context: Context, val videoUrl: String, val coverUrl: String? = "") {
 
     val playerValue = PlayerValue()
 
@@ -90,6 +90,11 @@ class VodController(context: Context) {
 }
 
 @Composable
-fun rememberVodController(context: Context = LocalContext.current) = remember {
-    VodController(context)
-}
+fun rememberVodController(
+    context: Context = LocalContext.current,
+    videoUrl: String,
+    coverUrl: String? = ""
+) =
+    remember {
+        VodController(context, videoUrl, coverUrl)
+    }
