@@ -56,6 +56,7 @@ fun VideoDetailScreen(videoViewModel: VideoViewModel = viewModel(), onBack: () -
     }
     //TODO 横屏后，点击屏幕状态栏即显示出来，而且不会再隐藏，如何处理这个问题？
     LaunchedEffect(configuration.orientation) {
+        vodController.restore()
         if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             videoBoxModifier = Modifier
                 .fillMaxWidth()

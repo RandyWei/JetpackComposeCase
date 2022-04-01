@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.view.View
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,9 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
 import java.util.*
 
@@ -66,6 +71,33 @@ fun VideoPlayer(vodController: VodController) {
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
 
+    //监听生命周期
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(vodController) {
+        val lifecycleEventObserver = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> vodController.resume()
+                Lifecycle.Event.ON_PAUSE -> vodController.pause()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(lifecycleEventObserver)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(lifecycleEventObserver)
+            vodController.stopPlay()
+        }
+    }
+
+    //当处于横屏状态时，启用 BackHandler 监听物理返回，回到竖屏状态。竖屏状态禁用 BackHandler
+    BackHandler(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            context.findActivity()?.requestedOrientation =
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+    }
+
     Box(
         modifier = Modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
@@ -92,7 +124,7 @@ fun VideoPlayer(vodController: VodController) {
         if (vodController.playerValue.state == PlayState.None) {
             Box() {
                 AsyncImage(
-                    model = vodController.coverUrl,
+                    model = vodController.playerValue.coverUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -102,7 +134,7 @@ fun VideoPlayer(vodController: VodController) {
 
                 IconButton(
                     onClick = {
-                        vodController.startPlay(vodController.videoUrl)
+                        vodController.startPlay()
                     },
                     modifier = Modifier
                         .align(Alignment.Center),
@@ -132,7 +164,39 @@ fun VideoPlayer(vodController: VodController) {
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Spacer(modifier = Modifier.height(1.dp))
+                if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    Spacer(modifier = Modifier.height(1.dp))
+                } else {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .height(45.dp)
+                            .fillMaxWidth()
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(
+                                        Color.Black,
+                                        Color.Transparent
+                                    )
+                                )
+                            )
+                    ) {
+                        IconButton(onClick = {
+                            context.findActivity()?.requestedOrientation =
+                                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                        }
+
+                        Text(vodController.playerValue.title ?: "", color = Color.White)
+                    }
+                }
+
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -189,6 +253,8 @@ fun VideoPlayer(vodController: VodController) {
                         if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                             context.findActivity()?.requestedOrientation =
                                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                            context.findActivity()?.window?.decorView?.systemUiVisibility =
+                                (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_IMMERSIVE)
                         } else {
                             context.findActivity()?.requestedOrientation =
                                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
