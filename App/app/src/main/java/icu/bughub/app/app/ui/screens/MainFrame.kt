@@ -20,7 +20,8 @@ import icu.bughub.app.app.model.entity.NavigationItem
 @Composable
 fun MainFrame(
     onNavigateToArticle: () -> Unit = {},
-    onNavigateToVideo: () -> Unit = {}
+    onNavigateToVideo: () -> Unit = {},
+    onNavigateToStudyHistory: () -> Unit = {}
 ) {
 
     val navigationItems = listOf(
@@ -65,7 +66,8 @@ fun MainFrame(
             when (currentNavigationIndex) {
                 0 -> StudyScreen(
                     onNavigateToArticle = onNavigateToArticle,
-                    onNavigateToVideo = onNavigateToVideo
+                    onNavigateToVideo = onNavigateToVideo,
+                    onNavigateToStudyHistory = onNavigateToStudyHistory
                 )
                 1 -> TaskScreen()
                 2 -> MineScreen()
