@@ -18,6 +18,10 @@ import coil.compose.AsyncImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.material.placeholder
+import com.google.accompanist.placeholder.material.shimmer
+import com.google.accompanist.placeholder.placeholder
 import icu.bughub.app.app.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import java.util.*
@@ -41,11 +45,18 @@ fun SwiperContent(vm: MainViewModel) {
     val coroutineScope = rememberCoroutineScope()
 
     DisposableEffect(Unit) {
+
+        coroutineScope.launch {
+            vm.swiperData()
+        }
+
         val timer = Timer()
 
         timer.schedule(object : TimerTask() {
             override fun run() {
-                coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+                if (vm.swiperLoaded) {
+                    coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+                }
             }
         }, 3000, 3000)
 
@@ -59,7 +70,8 @@ fun SwiperContent(vm: MainViewModel) {
         state = pagerState,
         modifier = Modifier
             .padding(horizontal = 8.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(8.dp)),
+        userScrollEnabled = vm.swiperLoaded
     ) { index ->
         val actualIndex =
             (index - initialIndex).floorMod(actualCount) //index - (index.floorDiv(actualCount)) * actualCount
@@ -69,7 +81,12 @@ fun SwiperContent(vm: MainViewModel) {
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(7 / 3f), contentScale = ContentScale.Crop
+                .aspectRatio(7 / 3f)
+                .placeholder(
+                    visible = !vm.swiperLoaded,
+                    highlight = PlaceholderHighlight.shimmer()
+                ),
+            contentScale = ContentScale.Crop
         )
     }
 }

@@ -83,13 +83,25 @@ class MainViewModel : ViewModel() {
     }
 
     //轮播图数据
-    val swiperData = listOf(
-        SwiperEntity("https://docs.bughub.icu/compose/assets/banner1.webp"),
-        SwiperEntity("https://docs.bughub.icu/compose/assets/banner2.webp"),
-        SwiperEntity("https://docs.bughub.icu/compose/assets/banner3.webp"),
-        SwiperEntity("https://docs.bughub.icu/compose/assets/banner4.jpg"),
-        SwiperEntity("https://docs.bughub.icu/compose/assets/banner5.jpg")
+    var swiperData by mutableStateOf(
+        listOf(
+            SwiperEntity("https://docs.bughub.icu/compose/assets/banner5.jpg")
+        )
     )
+        private set
+
+    var swiperLoaded by mutableStateOf(false)
+        private set
+
+    suspend fun swiperData() {
+        val swiperRes = homeService.banner()
+        if (swiperRes.code == 0 && swiperRes.data != null) {
+            swiperData = swiperRes.data
+            swiperLoaded = true
+        } else {
+            val message = swiperRes.message
+        }
+    }
 
     //通知数据
     val notifications =
