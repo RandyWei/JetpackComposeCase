@@ -10,18 +10,37 @@ import androidx.lifecycle.ViewModel
 import icu.bughub.app.app.model.entity.Category
 import icu.bughub.app.app.model.entity.DataType
 import icu.bughub.app.app.model.entity.SwiperEntity
+import icu.bughub.app.app.model.service.HomeService
 
 class MainViewModel : ViewModel() {
 
+    private val homeService = HomeService.instance()
+
+    //分类数据是否加载成功
+    var categoryLoaded by mutableStateOf(false)
+        private set
+
     //分类数据
-    val categories by mutableStateOf(
+    var categories by mutableStateOf(
         listOf(
-            Category("思想政治"),
-            Category("法律法规"),
-            Category("职业道德"),
-            Category("诚信自律")
+            Category("思想政治1", "1"),
+            Category("法律法规2", "2"),
+            Category("职业道德3", "3"),
+            Category("诚信自律4", "4")
         )
     )
+        private set
+
+    suspend fun categoryData() {
+        val categoryRes = homeService.category()
+        if (categoryRes.code == 0) {
+            categories = categoryRes.data
+            categoryLoaded = true
+        } else {
+            //不成功的情况下，读取 message
+            val message = categoryRes.message
+        }
+    }
 
     //当前分类下标
     var categoryIndex by mutableStateOf(0)

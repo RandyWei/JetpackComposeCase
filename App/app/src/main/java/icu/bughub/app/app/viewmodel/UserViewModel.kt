@@ -46,4 +46,11 @@ class UserViewModel(context: Context) : ViewModel() {
         }
         onClose()
     }
+
+    fun clear() {
+        viewModelScope.launch {
+            userInfoManager.clear() //清除本地数据存储
+            userInfo = null //置空内存数据
+        }
+    }
 }

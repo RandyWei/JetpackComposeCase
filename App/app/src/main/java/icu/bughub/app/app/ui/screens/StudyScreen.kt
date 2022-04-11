@@ -1,7 +1,6 @@
 package icu.bughub.app.app.ui.screens
 
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,8 +21,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import icu.bughub.app.app.ui.components.*
+import com.google.accompanist.placeholder.placeholder
+import icu.bughub.app.app.ui.components.ArticleItem
+import icu.bughub.app.app.ui.components.NotificationContent
+import icu.bughub.app.app.ui.components.SwiperContent
 import icu.bughub.app.app.ui.components.TopAppBar
+import icu.bughub.app.app.ui.components.VideoItem
 import icu.bughub.app.app.viewmodel.ArticleViewModel
 import icu.bughub.app.app.viewmodel.MainViewModel
 import icu.bughub.app.app.viewmodel.VideoViewModel
@@ -38,6 +42,11 @@ fun StudyScreen(
     onNavigateToVideo: () -> Unit = {},
     onNavigateToStudyHistory: () -> Unit = {}
 ) {
+
+    LaunchedEffect(Unit) {
+        vm.categoryData()
+    }
+
     Column(modifier = Modifier) {
         //标题栏
         TopAppBar(modifier = Modifier.padding(horizontal = 8.dp)) {
@@ -99,7 +108,7 @@ fun StudyScreen(
         TabRow(
             selectedTabIndex = vm.categoryIndex,
             backgroundColor = Color(0x22149EE7),
-            contentColor = Color(0xFF149EE7)
+            contentColor = Color(0xFF149EE7),
         ) {
             vm.categories.forEachIndexed { index, category ->
                 Tab(
@@ -108,11 +117,13 @@ fun StudyScreen(
                         vm.updateCategoryIndex(index)
                     },
                     selectedContentColor = Color(0xFF149EE7),
-                    unselectedContentColor = Color(0xFF666666)
+                    unselectedContentColor = Color(0xFF666666),
                 ) {
                     Text(
                         text = category.title,
-                        modifier = Modifier.padding(vertical = 8.dp),
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .placeholder(visible = !vm.categoryLoaded, color = Color.LightGray),
                         fontSize = 14.sp
                     )
                 }

@@ -34,4 +34,15 @@ class UserInfoManager(private val context: Context) {
         }
     }
 
+    /**
+     * 清空用户登录数据
+     *
+     */
+    suspend fun clear() {
+        context.userStore.edit {
+            it[LOGGED] = false
+            it[USERNAME] = ""
+        }
+    }
+
 }
