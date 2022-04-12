@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import icu.bughub.app.app.model.entity.ArticleEntity
 import icu.bughub.app.app.model.service.ArticleService
+import kotlinx.coroutines.delay
 
 class ArticleViewModel : ViewModel() {
 
@@ -67,12 +68,24 @@ class ArticleViewModel : ViewModel() {
     var listLoaded by mutableStateOf(false)
         private set
 
+    //是否正在刷新
+    var refreshing by mutableStateOf(false)
+        private set
+
     suspend fun fetchArticleList() {
         val res = articleService.list(pageOffset = pageOffset, pageSize = pageSize)
         if (res.code == 0 && res.data != null) {
             list = res.data
             listLoaded = true
+            refreshing = false
         }
+    }
+
+    suspend fun refresh() {
+        pageOffset = 1
+//        listLoaded = false
+        refreshing = true
+        fetchArticleList()
     }
 
     //HTML 头部
