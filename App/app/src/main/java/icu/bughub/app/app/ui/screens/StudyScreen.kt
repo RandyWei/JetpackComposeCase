@@ -1,10 +1,12 @@
 package icu.bughub.app.app.ui.screens
 
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -25,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import icu.bughub.app.app.extension.OnBottomReached
 import icu.bughub.app.app.ui.components.ArticleItem
 import icu.bughub.app.app.ui.components.NotificationContent
 import icu.bughub.app.app.ui.components.SwiperContent
@@ -55,6 +58,12 @@ fun StudyScreen(
     }
 
     val coroutineScope = rememberCoroutineScope()
+
+    val lazyListState = rememberLazyListState()
+    lazyListState.OnBottomReached(buffer = 3) {
+        Log.i("===", "OnBottomReached")
+        coroutineScope.launch { articleViewModel.loadMore() }
+    }
 
     Column(modifier = Modifier) {
         //标题栏
@@ -172,7 +181,7 @@ fun StudyScreen(
             state = rememberSwipeRefreshState(isRefreshing = articleViewModel.refreshing),
             onRefresh = { coroutineScope.launch { articleViewModel.refresh() } }
         ) {
-            LazyColumn() {
+            LazyColumn(state = lazyListState) {
                 //轮播图
                 item { SwiperContent(vm) }
 
