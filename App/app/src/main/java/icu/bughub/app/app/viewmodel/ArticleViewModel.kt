@@ -84,7 +84,7 @@ class ArticleViewModel : ViewModel() {
             }
             tmpList.addAll(res.data)
             //是否还有更多数据
-            hasMore = res.data.size < pageSize
+            hasMore = res.data.size == pageSize
             list = tmpList
             listLoaded = true
             refreshing = false

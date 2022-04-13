@@ -55,14 +55,15 @@ fun StudyScreen(
         vm.categoryData()
         //获取文章列表数据
         articleViewModel.fetchArticleList()
+        //获取视频列表数据
+        videoViewModel.fetchList()
     }
 
     val coroutineScope = rememberCoroutineScope()
 
     val lazyListState = rememberLazyListState()
     lazyListState.OnBottomReached(buffer = 3) {
-        Log.i("===", "OnBottomReached")
-        coroutineScope.launch { articleViewModel.loadMore() }
+        coroutineScope.launch { if (vm.showArticleList) articleViewModel.loadMore() else videoViewModel.loadMore() }
     }
 
     Column(modifier = Modifier) {
@@ -178,8 +179,8 @@ fun StudyScreen(
         }
 
         SwipeRefresh(
-            state = rememberSwipeRefreshState(isRefreshing = articleViewModel.refreshing),
-            onRefresh = { coroutineScope.launch { articleViewModel.refresh() } }
+            state = rememberSwipeRefreshState(isRefreshing = if (vm.showArticleList) articleViewModel.refreshing else videoViewModel.refreshing),
+            onRefresh = { coroutineScope.launch { if (vm.showArticleList) articleViewModel.refresh() else videoViewModel.refresh() } }
         ) {
             LazyColumn(state = lazyListState) {
                 //轮播图
@@ -203,7 +204,7 @@ fun StudyScreen(
                     items(videoViewModel.list) { videoEntity ->
                         VideoItem(modifier = Modifier.clickable {
                             onNavigateToVideo()
-                        }, videoEntity)
+                        }, videoEntity, videoViewModel.listLoaded)
                     }
                 }
             }
