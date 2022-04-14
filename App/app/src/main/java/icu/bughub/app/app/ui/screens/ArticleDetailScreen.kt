@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -126,7 +127,12 @@ fun ArticleDetailScreen(articleViewModel: ArticleViewModel = viewModel(), onBack
         },
         sheetPeekHeight = 0.dp
     ) {
-        WebView(webViewState)
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            WebView(webViewState)
+            if (!articleViewModel.infoLoaded) {
+                CircularProgressIndicator()
+            }
+        }
     }
 }
 

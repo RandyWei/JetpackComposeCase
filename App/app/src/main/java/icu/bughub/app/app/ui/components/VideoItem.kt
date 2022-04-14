@@ -97,7 +97,7 @@ fun VideoItem(modifier: Modifier = Modifier, videoEntity: VideoEntity, loaded: B
         )
 
         Text(
-            text = videoEntity.type,
+            text = videoEntity.type ?: "",
             fontSize = 10.sp,
             color = Color(0xFF999999),
             maxLines = 1,
