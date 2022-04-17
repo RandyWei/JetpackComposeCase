@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import icu.bughub.app.app.R
 import icu.bughub.app.app.compositionLocal.LocalUserViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(onClose: () -> Unit) {
@@ -40,15 +41,10 @@ fun LoginScreen(onClose: () -> Unit) {
 //        screenHeight = LocalConfiguration.current.screenHeightDp.dp.toPx()
 //    }
 
+
     val userViewModel = LocalUserViewModel.current
 
-    var userName by remember {
-        mutableStateOf("")
-    }
-
-    var password by remember {
-        mutableStateOf("")
-    }
+    val coroutineScope = rememberCoroutineScope()
 
     var showPassword by remember {
         mutableStateOf(false)
@@ -114,8 +110,8 @@ fun LoginScreen(onClose: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TextField(
-                    value = userName,
-                    onValueChange = { userName = it },
+                    value = userViewModel.userName,
+                    onValueChange = { userViewModel.userName = it },
                     singleLine = true,
                     leadingIcon = {
                         Icon(
@@ -138,12 +134,12 @@ fun LoginScreen(onClose: () -> Unit) {
                         focusedLabelColor = Color.LightGray,
                         unfocusedLabelColor = Color.LightGray,
                         cursorColor = Color.White
-                    )
+                    ), enabled = !userViewModel.loading
                 )
 
                 TextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = userViewModel.password,
+                    onValueChange = { userViewModel.password = it },
                     singleLine = true,
                     leadingIcon = {
                         Icon(
@@ -177,16 +173,27 @@ fun LoginScreen(onClose: () -> Unit) {
                         focusedLabelColor = Color.LightGray,
                         unfocusedLabelColor = Color.LightGray,
                         cursorColor = Color.White
-                    )
+                    ), enabled = !userViewModel.loading
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 TextButton(onClick = {
-                    userViewModel.login(onClose = onClose)
-                }) {
-                    Text(text = "登录", color = Color.White)
+                    coroutineScope.launch {
+                        userViewModel.login(onClose = onClose)
+                    }
+                }, enabled = !userViewModel.loading) {
+                    Row {
+                        Text(text = "登录", color = Color.White)
+                        if (userViewModel.loading) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                        }
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(text = userViewModel.error, color = Color.Red, fontSize = 13.sp)
             }
 
             TextButton(onClick = { }) {
