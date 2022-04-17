@@ -64,7 +64,7 @@ class UserViewModel(context: Context) : ViewModel() {
         val res = userService.signIn(userName, md5(password))
         if (res.code == 0 && res.data != null) {
             userInfo = res.data
-//            userInfoManager.save(userName)
+            userInfoManager.save(userName)
             onClose()
         } else {
             //失败
