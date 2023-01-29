@@ -56,7 +56,8 @@ class VodController(
      */
     fun startPlay() {
         playerValue.videoUrl = playerValue.videoUrl
-        vodPlayer.startPlay(playerValue.videoUrl)
+//        vodPlayer.startPlay(playerValue.videoUrl)
+        vodPlayer.startVodPlay(playerValue.videoUrl)
     }
 
     /**
